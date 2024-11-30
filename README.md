@@ -17,6 +17,129 @@
 [![llava_next-interleave_checkpoints](https://img.shields.io/badge/llava_next-interleave_checkpoints-blue)](https://huggingface.co/collections/lmms-lab/llava-next-interleave-66763c55c411b340b35873d1)
 [![llava_next-image_checkpoints](https://img.shields.io/badge/llava_next-image_checkpoints-blue)](https://huggingface.co/lmms-lab)
 
+# LLaVA-Video-7B-Qwen2 and LLaVA-NeXT
+
+This repository provides instructions and scripts to set up and run the LLaVA-Video-7B-Qwen2 model using the LLaVA-NeXT framework. The process involves cloning the repository, setting up the environment, and running a video captioning script. Additionally, it includes steps to generate metadata and upload the dataset to Hugging Face.
+
+## Table of Contents
+- [Prerequisites](#prerequisites)
+- [Installation](#installation)
+- [Running the Video Captioning Script](#running-the-video-captioning-script)
+- [Generating Metadata](#generating-metadata)
+- [Uploading to Hugging Face](#uploading-to-hugging-face)
+
+## Prerequisites
+
+Before you begin, ensure you have the following installed:
+- `git-lfs`
+- `ffmpeg`
+- `cbm`
+
+You can install these dependencies using the following command:
+
+```bash
+sudo apt-get update && sudo apt-get install git-lfs ffmpeg cbm
+```
+
+## Installation
+
+1. Clone the LLaVA-NeXT repository:
+
+```bash
+git clone https://github.com/LLaVA-VL/LLaVA-NeXT
+cd LLaVA-NeXT
+```
+
+2. Set up the conda environment:
+
+```bash
+conda create -n llava python=3.10 -y
+conda activate llava
+```
+
+3. Install the necessary Python packages:
+
+```bash
+pip install ipykernel
+python -m ipykernel install --user --name llava --display-name "llava"
+pip install flash-attn --no-build-isolation
+pip install --upgrade pip  # Enable PEP 660 support.
+pip install -e ".[train]"
+```
+
+## Running the Video Captioning Script
+
+To run the video captioning script, use the following command:
+
+```bash
+python llava_qwen_video_caption.py --input_path "原神风景视频（去水印）1920x1080_人物_resized" --output_path "原神风景视频（去水印）1920x1080_人物_captioned" --max_frames 19 --fps 1 --force_sample
+```
+
+## Generating Metadata
+
+After running the captioning script, you can generate metadata for the processed videos. The following script will create a `metadata.csv` file:
+
+```python
+pip install -U datasets
+
+def r_func(x):
+    with open(x, "r") as f:
+        return f.read().strip()
+
+import pathlib
+import pandas as pd
+import numpy as np
+
+pd.DataFrame(
+    pd.DataFrame(
+        pd.Series(
+            list(pathlib.Path("C:/Users/DELL/Downloads/原神风景视频（去水印）1920x1080_人物_captioned/").rglob("*"))
+        ).map(
+            str
+        ).map(lambda x: x if x.endswith("mp4") or x.endswith("txt") else np.nan).dropna().map(
+            lambda x: (x.split("\\")[-1].split(".")[0], x)
+        ).values.tolist()
+    ).groupby(0)[1].apply(list).map(
+        lambda l: list(map(lambda x: x.split("\\")[-1] if x.endswith(".mp4") else x, l))
+    ).map(
+        lambda l: {
+            "file_name": list(filter(lambda x: x.endswith(".mp4"), l))[0],
+            "prompt": r_func(list(filter(lambda x: x.endswith(".txt"), l))[0]),
+        }
+    ).values.tolist()
+).to_csv("metadata.csv", index=False)
+
+!cp metadata.csv 原神风景视频（去水印）1920x1080_人物_captioned
+```
+
+## Uploading to Hugging Face
+
+1. Load the dataset using the `datasets` library:
+
+```python
+from datasets import load_dataset
+video_ds = load_dataset("videofolder", data_dir="原神风景视频（去水印）1920x1080_人物_captioned/")
+video_ds
+```
+
+2. Log in to Hugging Face CLI:
+
+```bash
+!huggingface-cli login
+```
+
+3. Upload the dataset to Hugging Face:
+
+```bash
+svjack/video-dataset-genshin-impact-landscape-organized
+```
+
+4. Upload the `metadata.csv` file and create a `readme.md` file similar to the example provided in [sayakpaul/video-dataset-disney-organized](https://huggingface.co/datasets/sayakpaul/video-dataset-disney-organized).
+
+## Conclusion
+
+This guide provides a step-by-step process to set up and run the LLaVA-Video-7B-Qwen2 model using the LLaVA-NeXT framework. It also includes instructions on how to generate metadata and upload the dataset to Hugging Face.
+
 ## Release Notes
 
 - **[2024/10/04] 🔥 LLaVA-Video** (formerly LLaVA-NeXT-Video) has undergone a major upgrade! We are excited to release **LLaVA-Video-178K**, a high-quality synthetic dataset for video instruction tuning. This dataset includes:
