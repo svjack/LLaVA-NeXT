@@ -71,7 +71,54 @@ pip install flash-attn --no-build-isolation
 
 ### To run the video captioning script, use the following command: 
 ### videos in dir have length 6s and [640, 360] as resolution 
+
+- length 6s
 ### (refer to https://github.com/svjack/WatermarkRemover: python .\video_skipper.py  --input  .\原神风景视频（去水印）1920x1080_人物 -s 5 -e 10 -m 6)
+- Resize [640, 360]
+```python
+import os
+from moviepy.editor import VideoFileClip
+
+def resize_videos_in_folder(input_folder, output_folder, new_size=(640, 360)):
+    """
+    将输入文件夹中的所有视频文件调整大小并保存到输出文件夹中。
+
+    :param input_folder: 输入文件夹路径，包含要调整大小的视频文件。
+    :param output_folder: 输出文件夹路径，用于保存调整大小后的视频文件。
+    :param new_size: 新的视频尺寸，格式为 (width, height)。
+    """
+    # 确保输出文件夹存在
+    if not os.path.exists(output_folder):
+        os.makedirs(output_folder)
+
+    # 遍历输入文件夹中的所有文件
+    for filename in os.listdir(input_folder):
+        # 检查文件是否为视频文件（这里假设视频文件为常见的视频格式）
+        if filename.endswith(('.mp4', '.avi', '.mov', '.mkv', '.flv', '.wmv')):
+            input_path = os.path.join(input_folder, filename)
+            output_path = os.path.join(output_folder, filename)
+
+            # 使用 moviepy 加载视频文件
+            video_clip = VideoFileClip(input_path)
+
+            # 调整视频大小
+            resized_clip = video_clip.resize(new_size)
+
+            # 保存调整大小后的视频
+            resized_clip.write_videofile(output_path, codec='libx264')
+
+            # 关闭视频剪辑以释放资源
+            video_clip.close()
+            resized_clip.close()
+
+# 示例用法
+input_folder = 'C:/Users/DELL/Downloads/WatermarkRemover-master/WatermarkRemover-master/原神风景视频（去水印）1920x1080_人物_skip/'
+output_folder = 'C:/Users/DELL/Downloads/WatermarkRemover-master/WatermarkRemover-master/原神风景视频（去水印）1920x1080_人物_processed'
+new_size = (640, 360)  # 新的视频尺寸
+
+resize_videos_in_folder(input_folder, output_folder, new_size)
+```
+
 
 ```bash
 python llava_qwen_video_caption.py --input_path "原神风景视频（去水印）1920x1080_人物_resized" --output_path "原神风景视频（去水印）1920x1080_人物_captioned" --max_frames 19 --fps 1 --force_sample
