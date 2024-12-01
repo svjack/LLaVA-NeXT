@@ -114,6 +114,74 @@ pd.DataFrame(
 !cp metadata.csv 原神风景视频（去水印）1920x1080_人物_captioned
 ```
 
+- OR Use function like
+
+```python
+import os
+import shutil
+import uuid
+import pandas as pd
+from pathlib import Path
+
+def r_func(x):
+    with open(x, "r", encoding="utf-8") as f:
+        return f.read().strip()
+
+def process_files(input_path, output_path):
+    # 创建输出路径
+    os.makedirs(output_path, exist_ok=True)
+
+    # 获取所有mp4和txt文件
+    files = list(Path(input_path).rglob("*"))
+    mp4_files = [str(f) for f in files if f.suffix == ".mp4"]
+    txt_files = [str(f) for f in files if f.suffix == ".txt"]
+
+    # 创建一个字典来存储成对儿的文件
+    file_pairs = {}
+
+    # 遍历mp4文件，找到对应的txt文件
+    for mp4_file in mp4_files:
+        base_name = Path(mp4_file).stem
+        txt_file = next((f for f in txt_files if Path(f).stem == base_name), None)
+        if txt_file:
+            file_pairs[base_name] = (mp4_file, txt_file)
+
+    # 创建metadata列表
+    metadata = []
+
+    # 处理每一对文件
+    for base_name, (mp4_file, txt_file) in file_pairs.items():
+        # 生成UUID
+        unique_id = str(uuid.uuid4())
+
+        # 构建新的文件名
+        new_mp4_file = Path(output_path) / f"{unique_id}.mp4"
+        new_txt_file = Path(output_path) / f"{unique_id}.txt"
+
+        # 拷贝文件到新路径并重命名
+        shutil.copy(mp4_file, new_mp4_file)
+        shutil.copy(txt_file, new_txt_file)
+
+        # 读取txt文件内容
+        prompt = r_func(txt_file)
+
+        # 添加到metadata列表
+        metadata.append({
+            "file_name": f"{unique_id}.mp4",
+            "prompt": prompt,
+            "original_file_name": base_name,  # 添加重命名前的文件名
+        })
+
+    # 生成metadata.csv文件
+    df = pd.DataFrame(metadata)
+    df.to_csv(Path(output_path) / "metadata.csv", index=False)
+
+# 示例调用
+input_path = "风物集_captioned"
+output_path = "风物集_processed"
+process_files(input_path, output_path)
+```
+
 ## Uploading to Hugging Face
 
 1. Load the dataset using the `datasets` library:
