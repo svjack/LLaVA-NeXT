@@ -46,7 +46,7 @@ sudo apt-get update && sudo apt-get install git-lfs ffmpeg cbm
 1. Clone the LLaVA-NeXT repository:
 
 ```bash
-git clone https://github.com/LLaVA-VL/LLaVA-NeXT
+git clone https://github.com/svjack/LLaVA-NeXT
 cd LLaVA-NeXT
 ```
 
