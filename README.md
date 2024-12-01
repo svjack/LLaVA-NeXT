@@ -62,9 +62,9 @@ conda activate llava
 ```bash
 pip install ipykernel
 python -m ipykernel install --user --name llava --display-name "llava"
-pip install flash-attn --no-build-isolation
 pip install --upgrade pip  # Enable PEP 660 support.
 pip install -e ".[train]"
+pip install flash-attn --no-build-isolation
 ```
 
 ## Running the Video Captioning Script
