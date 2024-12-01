@@ -71,7 +71,7 @@ pip install -e ".[train]"
 
 ### To run the video captioning script, use the following command: 
 ### videos in dir have length 6s and [640, 360] as resolution 
-### (refer to https://github.com/svjack/WatermarkRemover)
+### (refer to https://github.com/svjack/WatermarkRemover: python .\video_skipper.py  --input  .\原神风景视频（去水印）1920x1080_人物 -s 5 -e 10 -m 6)
 
 ```bash
 python llava_qwen_video_caption.py --input_path "原神风景视频（去水印）1920x1080_人物_resized" --output_path "原神风景视频（去水印）1920x1080_人物_captioned" --max_frames 19 --fps 1 --force_sample
