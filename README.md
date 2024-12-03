@@ -39,6 +39,7 @@ You can install these dependencies using the following command:
 
 ```bash
 sudo apt-get update && sudo apt-get install git-lfs ffmpeg cbm
+sudo apt-get upgrade ffmpeg
 ```
 
 ## Installation
