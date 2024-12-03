@@ -65,6 +65,7 @@ python -m ipykernel install --user --name llava --display-name "llava"
 pip install --upgrade pip  # Enable PEP 660 support.
 pip install -e ".[train]"
 pip install flash-attn --no-build-isolation
+pip install moviepy=="1.0.3"
 ```
 
 ## Running the Video Captioning Script
