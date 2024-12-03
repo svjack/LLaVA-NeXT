@@ -176,7 +176,7 @@ def r_func(x):
     with open(x, "r", encoding="utf-8") as f:
         return f.read().strip()
 
-def process_files(input_path, output_path):
+def process_files(input_path, output_path, prefix=""):
     # 创建输出路径
     os.makedirs(output_path, exist_ok=True)
 
@@ -207,17 +207,23 @@ def process_files(input_path, output_path):
         new_mp4_file = Path(output_path) / f"{unique_id}.mp4"
         new_txt_file = Path(output_path) / f"{unique_id}.txt"
 
-        # 拷贝文件到新路径并重命名
+        # 拷贝mp4文件到新路径并重命名
         shutil.copy(mp4_file, new_mp4_file)
-        shutil.copy(txt_file, new_txt_file)
 
         # 读取txt文件内容
         prompt = r_func(txt_file)
 
+        # 在内容前添加prefix
+        modified_prompt = f"{prefix}{prompt}"
+
+        # 将修改后的内容写入新的txt文件
+        with open(new_txt_file, "w", encoding="utf-8") as f:
+            f.write(modified_prompt)
+
         # 添加到metadata列表
         metadata.append({
             "file_name": f"{unique_id}.mp4",
-            "prompt": prompt,
+            "prompt": modified_prompt,
             "original_file_name": base_name,  # 添加重命名前的文件名
         })
 
