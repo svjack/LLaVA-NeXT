@@ -237,6 +237,133 @@ input_path = "风物集_captioned"
 output_path = "风物集_processed"
 process_files(input_path, output_path)
 ```
+- OR
+```python
+import os
+import shutil
+import uuid
+import pandas as pd
+from pathlib import Path
+from tqdm import tqdm  # 导入 tqdm 用于显示进度条
+
+def r_func(x):
+    with open(x, "r", encoding="utf-8") as f:
+        return f.read().strip()
+
+def process_files(input_path, output_path, evaluation_results_path, prefix=""):
+    # 创建输出路径
+    os.makedirs(output_path, exist_ok=True)
+
+    # 读取 evaluation_results.csv 文件
+    evaluation_df = pd.read_csv(evaluation_results_path)
+
+    # 创建metadata列表
+    metadata = []
+
+    # 使用 tqdm 包装循环，显示进度条
+    for index, row in tqdm(evaluation_df.iterrows(), total=len(evaluation_df), desc="Processing files"):
+        video_name = row['video_name']
+        mp4_file = Path(input_path) / f"{video_name}"
+        txt_file = Path(input_path) / f"{Path(video_name).stem}.txt"
+
+        # 检查视频文件和文本文件是否存在
+        if mp4_file.exists() and txt_file.exists():
+            # 生成UUID
+            unique_id = str(uuid.uuid4())
+
+            # 构建新的文件名
+            new_mp4_file = Path(output_path) / f"{unique_id}.mp4"
+            new_txt_file = Path(output_path) / f"{unique_id}.txt"
+
+            # 拷贝mp4文件到新路径并重命名
+            shutil.copy(mp4_file, new_mp4_file)
+
+            # 读取txt文件内容
+            prompt = r_func(txt_file)
+
+            # 在内容前添加prefix
+            modified_prompt = f"{prefix}{prompt}"
+
+            # 将修改后的内容写入新的txt文件
+            with open(new_txt_file, "w", encoding="utf-8") as f:
+                f.write(modified_prompt)
+
+            # 添加到metadata列表
+            metadata_entry = {
+                "file_name": f"{unique_id}.mp4",
+                "prompt": modified_prompt,
+                "original_file_name": video_name,  # 添加重命名前的文件名
+            }
+
+            # 添加 evaluation_results.csv 中对应行的所有键值（除了 video_name）
+            for key, value in row.items():
+                if key != 'video_name':
+                    metadata_entry[key] = value
+
+            metadata.append(metadata_entry)
+
+    # 生成metadata.csv文件
+    df = pd.DataFrame(metadata)
+    df.to_csv(Path(output_path) / "metadata.csv", index=False)
+
+# 示例调用
+input_path = "../videos_captioned/"
+output_path = "../videos_upload/"
+evaluation_results_path = "evaluation_results.csv"  # 可输入参数
+process_files(input_path, output_path, evaluation_results_path)
+
+from moviepy.editor import VideoFileClip
+import numpy as np
+
+def detect_black_scenes(video_path, black_threshold=0.1, frame_threshold=0.9):
+    """
+    检测视频中是否存在黑色场景。
+
+    :param video_path: 视频文件的路径
+    :param black_threshold: 判断为黑色的亮度阈值（0-1之间），默认0.1
+    :param frame_threshold: 判断为黑色场景的帧比例阈值（0-1之间），默认0.9
+    :return: 如果视频中存在黑色场景，返回 True；否则返回 False
+    """
+    # 加载视频
+    clip = VideoFileClip(video_path)
+    
+    # 初始化黑色场景计数器
+    black_frames = 0
+    total_frames = 0
+    
+    # 遍历视频的每一帧
+    for frame in clip.iter_frames():
+        total_frames += 1
+        # 计算帧的平均亮度
+        brightness = np.mean(frame) / 255  # 将亮度归一化到 0-1 范围
+        if brightness < black_threshold:
+            black_frames += 1
+    
+    # 计算黑色帧的比例
+    black_frame_ratio = black_frames / total_frames
+    return black_frame_ratio
+    # 判断是否存在黑色场景
+    if black_frame_ratio >= frame_threshold:
+        return True
+    else:
+        return False
+
+df = pd.read_csv("../videos_upload/metadata.csv")
+from tqdm import tqdm 
+import os
+req = []
+for i, r in tqdm(df.iterrows()):
+    d = r.to_dict()
+    d["black_ratio"] = detect_black_scenes(os.path.join("../videos_upload", d["file_name"]))
+    req.append(d)
+
+df_with_score = pd.DataFrame(req)
+df_with_score.to_csv("../metadata.csv", index = False)
+
+!cp ../metadata.csv videos_upload
+!huggingface_cli login
+!huggingface-cli upload svjack/Genshin-Impact-Cutscenes-with-score-organized videos_upload . --repo-type dataset
+```
 
 ## Uploading to Hugging Face
 
