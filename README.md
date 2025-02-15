@@ -132,6 +132,55 @@ python llava_qwen_video_caption.py --input_path "原神风景视频（去水印�
 After running the captioning script, you can generate metadata for the processed videos. The following script will create a `metadata.csv` file:
 
 ```python
+import pathlib
+import pandas as pd
+
+def r_func(txt_path):
+    with open(txt_path, "r", encoding="utf-8") as f:
+        return f.read().strip()
+
+def generate_metadata(input_dir):
+    # 创建Path对象并标准化路径
+    input_path = pathlib.Path(input_dir).resolve()
+    
+    # 收集所有视频和文本文件
+    file_list = []
+    for file_path in input_path.rglob("*"):
+        if file_path.suffix.lower() in ('.mp4', '.txt'):
+            file_list.append({
+                "stem": file_path.stem,
+                "path": file_path,
+                "type": "video" if file_path.suffix.lower() == '.mp4' else "text"
+            })
+    
+    # 创建DataFrame并分组处理
+    df = pd.DataFrame(file_list)
+    grouped = df.groupby('stem')
+    
+    metadata = []
+    for stem, group in grouped:
+        # 获取组内文件
+        videos = group[group['type'] == 'video']
+        texts = group[group['type'] == 'text']
+        
+        # 确保每组有且只有一个视频和一个文本文件
+        if len(videos) == 1 and len(texts) == 1:
+            video_path = videos.iloc[0]['path']
+            text_path = texts.iloc[0]['path']
+            
+            metadata.append({
+                "file_name": video_path.name,  # 自动处理不同系统的文件名
+                "prompt": r_func(text_path)
+            })
+    
+    # 保存结果到CSV
+    output_path = input_path.parent / "metadata.csv"
+    pd.DataFrame(metadata).to_csv(output_path, index=False, encoding='utf-8-sig')
+    print(f"Metadata generated at: {output_path}")
+
+```
+
+```python
 pip install -U datasets
 
 def r_func(x):
