@@ -77,7 +77,7 @@ def main(args):
                 os.makedirs(args.output_path, exist_ok = True)
             output_file_name = os.path.splitext(video_file)[0] + ".txt"
             output_file_path = os.path.join(args.output_path, output_file_name)
-            with open(output_file_path, 'w') as f:
+            with open(output_file_path, 'w', encoding = "utf-8") as f:
                 f.write(text_outputs)
 
             # Copy video to output path
