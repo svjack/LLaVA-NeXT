@@ -178,6 +178,17 @@ def generate_metadata(input_dir):
     pd.DataFrame(metadata).to_csv(output_path, index=False, encoding='utf-8-sig')
     print(f"Metadata generated at: {output_path}")
 
+'''
+---
+configs:
+- config_name: default
+  data_files:
+  - split: train
+    path: 
+    - "*.mp4"
+    - "metadata.csv"
+---
+'''
 ```
 
 ```python
