@@ -1,6 +1,6 @@
 '''
 sudo apt-get update && sudo apt-get install git-lfs cbm ffmpeg
-sudo apt-get upgrade ffmpeg
+#sudo apt-get upgrade ffmpeg
 
 # 1. 卸载旧版 transformers（如有）
 pip uninstall transformers -y
