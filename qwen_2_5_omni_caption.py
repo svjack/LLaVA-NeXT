@@ -10,7 +10,8 @@ pip install git+https://github.com/huggingface/transformers@3a1ead0aabed473eafe5
 pip install torch==2.5.0 torchvision accelerate soundfile tqdm bitsandbytes "httpx[socks]"
 
 # 3. 安装多媒体工具包（优先 decord）
-pip install "qwen-omni-utils[decord]"
+#pip install "qwen-omni-utils[decord]"
+pip install "qwen-omni-utils"
 
 # 4. 安装 Flash Attention 2（可选）
 #pip install flash-attn --no-build-isolation
