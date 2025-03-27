@@ -14,7 +14,7 @@ pip install torch==2.5.0 torchvision accelerate soundfile tqdm bitsandbytes "htt
 pip install "qwen-omni-utils"
 
 # 4. 安装 Flash Attention 2（可选）
-#pip install flash-attn --no-build-isolation
+pip install flash-attn --no-build-isolation
 
 git clone https://github.com/svjack/LLaVA-NeXT && cd LLaVA-NeXT
 
