@@ -1,12 +1,13 @@
 '''
 sudo apt-get update && sudo apt-get install git-lfs cbm ffmpeg
+sudo apt-get upgrade ffmpeg
 
 # 1. 卸载旧版 transformers（如有）
 pip uninstall transformers -y
 
 # 2. 安装源码版 transformers 和核心依赖
 pip install git+https://github.com/huggingface/transformers@3a1ead0aabed473eafe527915eea8c197d424356
-pip install torch==2.5.0 torchvision accelerate soundfile tqdm
+pip install torch==2.5.0 torchvision accelerate soundfile tqdm bitsandbytes
 
 # 3. 安装多媒体工具包（优先 decord）
 pip install "qwen-omni-utils[decord]"
