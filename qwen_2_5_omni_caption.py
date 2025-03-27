@@ -1,3 +1,27 @@
+'''
+sudo apt-get update && sudo apt-get install git-lfs cbm ffmpeg
+
+# 1. 卸载旧版 transformers（如有）
+pip uninstall transformers -y
+
+# 2. 安装源码版 transformers 和核心依赖
+pip install git+https://github.com/huggingface/transformers@3a1ead0aabed473eafe527915eea8c197d424356
+pip install torch==2.5.0 torchvision accelerate soundfile tqdm
+
+# 3. 安装多媒体工具包（优先 decord）
+pip install "qwen-omni-utils[decord]"
+
+# 4. 安装 Flash Attention 2（可选）
+#pip install flash-attn --no-build-isolation
+
+git clone https://github.com/svjack/LLaVA-NeXT && cd LLaVA-NeXT
+
+git clone https://huggingface.co/datasets/svjack/Bakuman_Videos_Splited
+
+python qwen_2_5_omni_caption.py --input_path Bakuman_Videos_Splited \
+    --output_path Bakuman_Videos_Splited_Captioned 
+'''
+
 import os
 import argparse
 import soundfile as sf
@@ -54,7 +78,7 @@ def main(args):
             output_file = os.path.splitext(video_file)[0] + ".txt"
             output_path = os.path.join(args.output_path, output_file)
             with open(output_path, 'w', encoding='utf-8') as f:
-                f.write(description)
+                f.write("In the style of Bakuman , " + description)
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(description="Video captioning using Qwen2.5-Omni model")
