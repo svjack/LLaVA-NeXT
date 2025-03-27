@@ -7,7 +7,7 @@ pip uninstall transformers -y
 
 # 2. 安装源码版 transformers 和核心依赖
 pip install git+https://github.com/huggingface/transformers@3a1ead0aabed473eafe527915eea8c197d424356
-pip install torch==2.5.0 torchvision accelerate soundfile tqdm bitsandbytes
+pip install torch==2.5.0 torchvision accelerate soundfile tqdm bitsandbytes "httpx[socks]"
 
 # 3. 安装多媒体工具包（优先 decord）
 pip install "qwen-omni-utils[decord]"
