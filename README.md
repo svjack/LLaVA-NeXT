@@ -131,6 +131,52 @@ python llava_qwen_video_caption.py --input_path "原神风景视频（去水印�
 
 After running the captioning script, you can generate metadata for the processed videos. The following script will create a `metadata.csv` file:
 
+```bash
+#!/bin/bash
+
+# 源目录和目标目录
+src_dir="Toradora_Videos_Omni_Captioned"
+dst_dir0="Toradora_Videos_Omni_Captioned_0"
+dst_dir1="Toradora_Videos_Omni_Captioned_1"
+
+# 创建目标目录
+mkdir -p "$dst_dir0" "$dst_dir1"
+
+# 使用带引号的变量和IFS处理文件名中的空格
+IFS=$'\n'
+
+# 获取所有.mp4文件并按文件名排序
+files=($(find "$src_dir" -maxdepth 1 -name "*.mp4" -print0 | sort -z | xargs -0 printf "%s\n"))
+
+# 计算文件总数和中间点
+total_files=${#files[@]}
+half_point=$((total_files / 2))
+
+# 复制前一半到dst_dir0
+for ((i=0; i<half_point; i++)); do
+    file="${files[i]}"
+    base_name=$(basename "$file" .mp4)
+    cp "$file" "$dst_dir0/"
+    txt_file="$src_dir/$base_name.txt"
+    if [ -f "$txt_file" ]; then
+        cp "$txt_file" "$dst_dir0/"
+    fi
+done
+
+# 复制后一半到dst_dir1
+for ((i=half_point; i<total_files; i++)); do
+    file="${files[i]}"
+    base_name=$(basename "$file" .mp4)
+    cp "$file" "$dst_dir1/"
+    txt_file="$src_dir/$base_name.txt"
+    if [ -f "$txt_file" ]; then
+        cp "$txt_file" "$dst_dir1/"
+    fi
+done
+
+echo "文件已成功分割并复制到目标目录"
+```
+
 ```python
 import pathlib
 import pandas as pd
