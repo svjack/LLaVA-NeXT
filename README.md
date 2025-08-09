@@ -67,7 +67,7 @@ pip install --upgrade pip  # Enable PEP 660 support.
 pip install torch==2.7.0
 pip install -e ".[train]"
 #pip install flash_attn==2.3.4 --no-build-isolation
-pip install flash_attn
+pip install flash_attn --no-build-isolation
 pip install moviepy=="1.0.3"
 ```
 
