@@ -69,6 +69,10 @@ pip install -e ".[train]"
 pip install flash_attn==2.3.4 --no-build-isolation
 #pip install flash_attn --no-build-isolation
 pip install moviepy=="1.0.3"
+
+pip uninstall -y torch torchvision flash_attn
+pip install torch==2.7.0 torchvision
+pip install flash_attn
 ```
 
 ## Running the Video Captioning Script
