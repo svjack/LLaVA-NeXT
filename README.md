@@ -73,6 +73,9 @@ pip install moviepy=="1.0.3"
 pip uninstall -y torch torchvision flash_attn
 pip install torch==2.7.0 torchvision
 pip install flash_attn
+
+pip install modelscope
+modelscope download lmms-lab/LLaVA-Video-7B-Qwen2 --local_dir="LLaVA-Video-7B-Qwen2"
 ```
 
 ## Running the Video Captioning Script
